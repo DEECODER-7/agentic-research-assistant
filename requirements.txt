@@ -1,0 +1,28 @@
+# LLM + orchestration
+langchain>=0.2.0
+langchain-community>=0.2.0
+langchain-groq>=0.1.5
+langgraph>=0.1.0
+
+# Embeddings (local, free — no API cost)
+sentence-transformers>=2.7.0
+
+# Vector store
+chromadb>=0.5.0
+
+# Document sourcing
+arxiv>=2.1.0
+pypdf>=4.2.0
+
+# Web search fallback (free, no API key)
+duckduckgo-search>=6.1.0
+
+# API + UI
+fastapi>=0.110.0
+uvicorn[standard]>=0.29.0
+streamlit>=1.32.0
+requests>=2.31.0
+
+# Utilities
+python-dotenv>=1.0.0
+pytest>=8.0.0

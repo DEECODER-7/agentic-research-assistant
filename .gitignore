@@ -1,0 +1,15 @@
+venv/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.idea/
+.vscode/
+.env
+
+# Data - raw PDFs are large and easily regenerated from arXiv, so keep them
+# out of git. The built vector store (data/chroma_db/) is intentionally NOT
+# ignored — see the Stage 6 deployment notes in the README for why.
+data/papers/
+
+.DS_Store
