@@ -9,13 +9,15 @@ sentence-transformers>=2.7.0
 
 # Vector store
 chromadb>=0.5.0
+langchain-chroma>=0.1.4
+langchain-huggingface>=0.0.3
 
 # Document sourcing
 arxiv>=2.1.0
 pypdf>=4.2.0
 
 # Web search fallback (free, no API key)
-duckduckgo-search>=6.1.0
+ddgs>=9.0.0
 
 # API + UI
 fastapi>=0.110.0
