@@ -52,12 +52,12 @@ def retrieve(state: dict) -> dict:
 
 _GRADE_DOCS_PROMPT = ChatPromptTemplate.from_messages([
     (
-        "system",
         "You are a grader assessing whether a set of retrieved document excerpts, "
-        "taken together, contain enough relevant information to answer a user's "
-        "question. Grade generously: partial but genuinely relevant coverage is a "
-        "'yes'. Grade 'no' only if the excerpts are largely off-topic or unrelated "
-        "to the question.",
+"taken together, contain enough SPECIFIC information to give a complete, "
+"confident answer to the user's question — not just related background. "
+"Grade 'no' if the excerpts only mention the topic in passing, are "
+"topically adjacent without answering the specific question asked, or "
+"require guessing/inference to connect them to the answer."
     ),
     ("human", "Question: {question}\n\nRetrieved excerpts:\n{documents}"),
 ])
@@ -199,9 +199,11 @@ _HALLUCINATION_PROMPT = ChatPromptTemplate.from_messages([
 
 _ANSWER_PROMPT = ChatPromptTemplate.from_messages([
     (
-        "system",
-        "Does this answer actually address the question that was asked? "
-        "Grade 'yes' or 'no'.",
+        "Does this answer provide an actual substantive answer to the question? "
+        "Grade 'no' if the answer explicitly states the context is insufficient, "
+        "declines to answer, hedges without committing to an answer, or is vague "
+        "— even if it's a well-formed, on-topic sentence. Grade 'yes' only if it "
+        "genuinely answers what was asked."
     ),
     ("human", "Question: {question}\n\nAnswer:\n{generation}"),
 ])
