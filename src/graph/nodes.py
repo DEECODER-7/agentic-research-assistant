@@ -15,10 +15,13 @@ Each function takes the current GraphState and returns a dict of fields to
 update (LangGraph merges this into state) — this is the standard LangGraph
 node signature.
 """
-from ddgs import DDGS
+
+import os
+
 from langchain_core.documents import Document
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
+from tavily import TavilyClient
 
 from src.graph.grading_models import GradeAnswer, GradeDocuments, GradeHallucination
 from src.graph.llm import get_llm
@@ -119,17 +122,30 @@ def web_search(state: dict) -> dict:
     """
     Falls back to a live web search when local retrieval was insufficient,
     rather than generating a confident-sounding answer from weak chunks.
+
+    Uses the Tavily API rather than scraping a search engine directly
+    (the earlier ddgs-based approach) — search-engine scraping is
+    unreliable from cloud hosts, which get rate-limited or blocked in a
+    way a residential IP doesn't. Tavily is a real API built for this.
     """
     print("---WEB SEARCH---")
-    with DDGS() as ddgs:
-        results = list(ddgs.text(state["question"], max_results=WEB_SEARCH_MAX_RESULTS))
+    tavily_api_key = os.environ.get("TAVILY_API_KEY")
+    if not tavily_api_key:
+        raise OSError(
+            "TAVILY_API_KEY environment variable is required. Get a free "
+            "key at https://tavily.com, then set it via "
+            "`$env:TAVILY_API_KEY = \"...\"` locally or as a secret in the "
+            "Render dashboard for the deployed API."
+        )
+    client = TavilyClient(api_key=tavily_api_key)
+    response = client.search(state["question"], max_results=WEB_SEARCH_MAX_RESULTS)
 
     documents = [
         Document(
-            page_content=r.get("body", ""),
-            metadata={"title": r.get("title", "Web result"), "url": r.get("href", "")},
+            page_content=r.get("content", ""),
+            metadata={"title": r.get("title", "Web result"), "url": r.get("url", "")},
         )
-        for r in results
+        for r in response.get("results", [])
     ]
     print(f"  got {len(documents)} web results")
     return {"documents": documents, "web_search_used": True}

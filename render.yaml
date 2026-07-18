@@ -25,3 +25,5 @@ services:
         sync: false  # set manually in the dashboard — keeps it out of git
       - key: HF_TOKEN
         sync: false  # free token from huggingface.co/settings/tokens
+      - key: TAVILY_API_KEY
+        sync: false
