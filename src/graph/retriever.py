@@ -4,9 +4,9 @@ exposes it as a LangChain retriever for the graph's retrieve node.
 """
 
 from langchain_chroma import Chroma
-from langchain_huggingface import HuggingFaceEmbeddings
 
-from src.ingestion.config import EMBEDDING_MODEL_NAME, RETRIEVAL_TOP_K, VECTOR_STORE_DIR
+from src.ingestion.config import RETRIEVAL_TOP_K, VECTOR_STORE_DIR
+from src.ingestion.embeddings import get_embeddings
 
 _retriever = None  # lazy singleton — avoids reloading the embedding model on every call
 
@@ -23,7 +23,7 @@ def get_retriever():
                 f"No vector store found at {VECTOR_STORE_DIR}. "
                 "Run `python -m src.ingestion.build_index` first (Stage 1)."
             )
-        embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL_NAME)
+        embeddings = get_embeddings()
         vectorstore = Chroma(
             persist_directory=str(VECTOR_STORE_DIR),
             embedding_function=embeddings,

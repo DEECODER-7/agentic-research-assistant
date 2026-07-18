@@ -1,17 +1,18 @@
 """
 Fetches real papers from arXiv on RAG/agentic AI topics, extracts their text,
-chunks it, embeds it with a local (free) embedding model, and persists it all
-into a local ChromaDB vector store.
+chunks it, embeds it via a remote embedding API, and persists it all into a
+local ChromaDB vector store.
 
 Usage:
     python -m src.ingestion.build_index
 """
+
 from urllib.request import urlretrieve
+
 import arxiv
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_chroma import Chroma
 from langchain_community.document_loaders import PyPDFLoader
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import Chroma
 from langchain_core.documents import Document
 
 from src.ingestion.config import (
@@ -23,6 +24,7 @@ from src.ingestion.config import (
     PDF_DIR,
     VECTOR_STORE_DIR,
 )
+from src.ingestion.embeddings import get_embeddings
 
 
 def fetch_papers() -> list[arxiv.Result]:
@@ -117,9 +119,9 @@ def load_and_chunk(downloaded: list[dict]) -> list[Document]:
 
 
 def build_vector_store(chunks: list[Document]) -> None:
-    """Embeds all chunks with a local model and persists them to ChromaDB."""
-    print(f"Loading embedding model: {EMBEDDING_MODEL_NAME} (first run downloads it, ~90MB)...")
-    embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL_NAME)
+    """Embeds all chunks via the remote API and persists them to ChromaDB."""
+    print(f"Loading embedding model: {EMBEDDING_MODEL_NAME} (via HF Inference API)...")
+    embeddings = get_embeddings()
 
     print("Embedding chunks and building vector store (this is the slow step)...")
     VECTOR_STORE_DIR.mkdir(parents=True, exist_ok=True)

@@ -4,8 +4,8 @@
 #   1. Push this repo to GitHub, with data/chroma_db/ committed (see README).
 #   2. In Render: New -> Blueprint -> connect this repo. Render reads this
 #      file automatically and creates the service below.
-#   3. Set GROQ_API_KEY as a secret in the Render dashboard (Environment tab)
-#      — never commit it here or anywhere in the repo.
+#   3. Set GROQ_API_KEY and HF_TOKEN as secrets in the Render dashboard
+#      (Environment tab) — never commit them here or anywhere in the repo.
 #
 # The free tier spins down after ~15 min idle and takes ~30-60s to wake back
 # up on the next request — expected for a portfolio deployment, not a bug.
@@ -23,3 +23,5 @@ services:
         value: 3.12.0
       - key: GROQ_API_KEY
         sync: false  # set manually in the dashboard — keeps it out of git
+      - key: HF_TOKEN
+        sync: false  # free token from huggingface.co/settings/tokens
