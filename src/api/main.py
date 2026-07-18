@@ -6,7 +6,7 @@ Usage:
 
 Then POST to http://localhost:8000/ask with {"question": "..."}.
 """
-
+from src.graph.retriever import get_retriever
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -27,7 +27,16 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
+@app.on_event("startup")
+def preload_retriever() -> None:
+    """
+    Loads the embedding model and vector store once at boot instead of
+    lazily on the first request. Without this, the first /ask call pays
+    that load cost on top of its own LLM calls — on a resource-constrained
+    host that's slow enough to starve the health check and trigger an
+    unnecessary restart mid-request.
+    """
+    get_retriever()
 
 @app.get("/health")
 def health() -> dict:
